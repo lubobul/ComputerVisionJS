@@ -63,7 +63,7 @@ function getMouseCoordinates(e)
 
 var width = 1280;
 var height = 960;
-var blobColorThreshold = 20; //0-255
+var blobColorThreshold = 25; //0-255
 var timesTrackedThreshold = 1; //amount of pixels found
 
 var trackColor = {
@@ -101,7 +101,7 @@ function update() {
         lerpX = lerp(lerpX, avarageBlogPosition_x, this.deltaTime * lerpVelocity);
         lerpY = lerp(lerpY, avarageBlogPosition_y, this.deltaTime * lerpVelocity);
 
-        drawOval(lerpX, lerpY, 50);
+        drawOval(lerpX, lerpY, 40);
     }
 
     timesTracked = 0;
@@ -120,7 +120,7 @@ function traverseBitmap(pixels) {
 
             let pixIndex = x + y * width;
 
-            let colorDistance = distanceSquared(pixels[pixIndex], 
+            let colorDistance = rgbDistance(pixels[pixIndex], 
                 pixels[pixIndex +1], 
                 pixels[pixIndex +2],
                 trackColor.r,
@@ -128,7 +128,7 @@ function traverseBitmap(pixels) {
                 trackColor.b);
                 
             //check if tracked color is within the Threshold 
-            if (colorDistance < Math.pow(blobColorThreshold,2)) {
+            if (colorDistance < blobColorThreshold) {
                 
                 avarageBlogPosition_x += x;
                 avarageBlogPosition_y += y;
@@ -146,9 +146,9 @@ function traverseBitmap(pixels) {
     avarageBlogPosition_y = (avarageBlogPosition_y/4) /timesTracked;
 }
 
-function distanceSquared(r1, g1, b1, r2, g2, b2) {
+function rgbDistance(r1, g1, b1, r2, g2, b2) {
 
-    return (r2-r1)*(r2-r1) + (g2-g1)*(g2-g1) +(b2-b1)*(b2-b1);
+    return Math.sqrt(Math.pow((r2-r1), 2) + Math.pow((g2-g1),2) + Math.pow((b2-b1), 2));
 }
 
 function getPixelRGB(x, y){
@@ -169,10 +169,10 @@ function drawOval(x, y, radius){
 
     context.beginPath();
     context.arc(x, y, radius, 0, 2 * Math.PI, false);
-    context.fillStyle = 'green';
+    context.fillStyle = 'gray';
     context.fill();
     context.lineWidth = 5;
-    context.strokeStyle = '#003300';
+    context.strokeStyle = 'green';
     context.stroke();
 }
 
