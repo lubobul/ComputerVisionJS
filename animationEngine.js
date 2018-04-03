@@ -26,7 +26,7 @@ class AnimationEngine
         this.previousTimeLog = null;
         this.isRunning = true;
         this.fps = 0;
-        this.delta_time = 0;
+        this.deltaTime = 0;
     }
 
     /**
@@ -72,12 +72,12 @@ class AnimationEngine
         }
 
         //calculate dt in seconds
-        this.delta_time = (new Date().getTime() - this.previousTimeLog) / 1000;
+        this.deltaTime = (new Date().getTime() - this.previousTimeLog) / 1000;
 
         this.previousTimeLog = new Date().getTime();
 
         //calculate fps
-        this.fps = 1 / this.delta_time;
+        this.fps = 1 / this.deltaTime;
 
         this.animationFrameCallback.call(this);
 

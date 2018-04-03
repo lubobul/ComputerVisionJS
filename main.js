@@ -64,13 +64,19 @@ function getMouseCoordinates(e)
 var width = 1280;
 var height = 960;
 var blobColorThreshold = 20; //0-255
-var timesTrackedThreshold = 20; //amount of pixels found
+var timesTrackedThreshold = 1; //amount of pixels found
 
 var trackColor = {
     r : 0,
     g : 0,
     b : 0
 }
+
+var avarageBlogPosition_x = 0;
+var avarageBlogPosition_y = 0;
+var lerpX = 0;
+var lerpY = 0;
+var lerpVelocity = 10;
 
 //The update function is called once everytime the browser renders -> 60 fps cap
 function update() {
@@ -90,8 +96,12 @@ function update() {
     // Draw the ImageData at the given (x,y) coordinates.
     context.putImageData(imageData, 0, 0);
 
-    if(timesTracked>20){
-        drawOval(avarageBlogPosition_x, avarageBlogPosition_y, 50);
+    if(timesTracked > timesTrackedThreshold){
+
+        lerpX = lerp(lerpX, avarageBlogPosition_x, this.deltaTime * lerpVelocity);
+        lerpY = lerp(lerpY, avarageBlogPosition_y, this.deltaTime * lerpVelocity);
+
+        drawOval(lerpX, lerpY, 50);
     }
 
     timesTracked = 0;
@@ -99,8 +109,8 @@ function update() {
     avarageBlogPosition_y = 0;
 }
 
-var avarageBlogPosition_x = 0;
-var avarageBlogPosition_y = 0;
+
+
 var timesTracked = 0;
 
 function traverseBitmap(pixels) {
@@ -165,3 +175,7 @@ function drawOval(x, y, radius){
     context.strokeStyle = '#003300';
     context.stroke();
 }
+
+function lerp(v0, v1, t) {
+    return v0 + t * (v1 - v0);
+  }
