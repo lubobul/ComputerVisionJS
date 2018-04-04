@@ -76,7 +76,7 @@ var avarageBlogPosition_x = 0;
 var avarageBlogPosition_y = 0;
 var lerpX = 0;
 var lerpY = 0;
-var lerpVelocity = 10;
+var lerpVelocity = 5;
 
 //The update function is called once everytime the browser renders -> 60 fps cap
 function update() {
@@ -128,7 +128,7 @@ function traverseBitmap(pixels) {
                 trackColor.b);
                 
             //check if tracked color is within the Threshold 
-            if (colorDistance < blobColorThreshold) {
+            if (colorDistance < Math.pow(blobColorThreshold, 2)) {
                 
                 avarageBlogPosition_x += x;
                 avarageBlogPosition_y += y;
@@ -148,7 +148,7 @@ function traverseBitmap(pixels) {
 
 function rgbDistance(r1, g1, b1, r2, g2, b2) {
 
-    return Math.sqrt(Math.pow((r2-r1), 2) + Math.pow((g2-g1),2) + Math.pow((b2-b1), 2));
+    return Math.pow((r2-r1), 2) + Math.pow((g2-g1),2) + Math.pow((b2-b1), 2)                
 }
 
 function getPixelRGB(x, y){
