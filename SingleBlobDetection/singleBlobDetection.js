@@ -1,5 +1,6 @@
 'use strict'
 
+//grab video element (hidden)
 var video = document.getElementById('video');
 
 var animationEngine = new AnimationEngine();
@@ -61,9 +62,10 @@ function getMouseCoordinates(e)
     return {x, y}
 }
 
+//Declare some global vars
 var width = 1280;
 var height = 960;
-var blobColorThreshold = 25; //0-255
+var blobColorThreshold = 30; //0-255
 var timesTrackedThreshold = 1; //amount of pixels found
 
 var trackColor = {
@@ -72,13 +74,16 @@ var trackColor = {
     b : 0
 }
 
-var avarageBlogPosition_x = 0;
-var avarageBlogPosition_y = 0;
+var avarageBlobPosition_x = 0;
+var avarageBlobPosition_y = 0;
 var lerpX = 0;
 var lerpY = 0;
 var lerpVelocity = 5;
+var timesTracked = 0;
 
-//The update function is called once everytime the browser renders -> 60 fps cap
+/**
+ * The update function is called once everytime the browser renders -> 60 fps cap
+ */
 function update() {
 
     //invert on X axis, we want to have a mirror
@@ -98,23 +103,25 @@ function update() {
 
     if(timesTracked > timesTrackedThreshold){
 
-        lerpX = lerp(lerpX, avarageBlogPosition_x, this.deltaTime * lerpVelocity);
-        lerpY = lerp(lerpY, avarageBlogPosition_y, this.deltaTime * lerpVelocity);
+        //Linear interpolation step = deltaTime(coming from animationEngine) * lerpVelocity
+        lerpX = lerp(lerpX, avarageBlobPosition_x, this.deltaTime * lerpVelocity);
+        lerpY = lerp(lerpY, avarageBlobPosition_y, this.deltaTime * lerpVelocity);
 
-        drawOval(lerpX, lerpY, 40);
+        drawCircle(lerpX, lerpY, 40);
     }
 
     timesTracked = 0;
-    avarageBlogPosition_x = 0;
-    avarageBlogPosition_y = 0;
+    avarageBlobPosition_x = 0;
+    avarageBlobPosition_y = 0;
 }
 
-
-
-var timesTracked = 0;
-
+/**
+ * Traverse pixels in a bitmap coming from canvas
+ * @param {*} pixels 
+ */
 function traverseBitmap(pixels) {
 
+    //increment for loops with x/y += 4, because in bitmapt [0]-R, [1]-G, [2]-B, [3]-Alpha channel
     for (let x = 0, n = width * 4; x < n; x += 4) {
         for (let y = 0, m = height * 4; y < m; y += 4) {
 
@@ -130,10 +137,11 @@ function traverseBitmap(pixels) {
             //check if tracked color is within the Threshold 
             if (colorDistance < Math.pow(blobColorThreshold, 2)) {
                 
-                avarageBlogPosition_x += x;
-                avarageBlogPosition_y += y;
+                avarageBlobPosition_x += x;
+                avarageBlobPosition_y += y;
                 timesTracked++;
                 
+                //set tracked color to white (easier to see what's happening)
                 pixels[pixIndex    ] = 255; // red
                 pixels[pixIndex + 1] = 255; // green
                 pixels[pixIndex + 2] = 255; // blue
@@ -141,17 +149,30 @@ function traverseBitmap(pixels) {
         }
     }
 
-   
-    avarageBlogPosition_x = (avarageBlogPosition_x/4) /timesTracked;
-    avarageBlogPosition_y = (avarageBlogPosition_y/4) /timesTracked;
+    //find avarage for blob x and y, devide by 4 because of bitmap size
+    avarageBlobPosition_x = (avarageBlobPosition_x/4) /timesTracked;
+    avarageBlobPosition_y = (avarageBlobPosition_y/4) /timesTracked;
 }
 
-//euclidean distance
+/**
+ * Euclidean distance
+ * @param {*} r1 
+ * @param {*} g1 
+ * @param {*} b1 
+ * @param {*} r2 
+ * @param {*} g2 
+ * @param {*} b2 
+ */
 function rgbDistance(r1, g1, b1, r2, g2, b2) {
 
     return Math.pow((r2-r1), 2) + Math.pow((g2-g1),2) + Math.pow((b2-b1), 2)                
 }
 
+/**
+ * Returns R, G, B values for a pixel on x, y position
+ * @param {*} x 
+ * @param {*} y 
+ */
 function getPixelRGB(x, y){
 
     var imageData = context.getImageData(0, 0, width, height);
@@ -166,7 +187,13 @@ function getPixelRGB(x, y){
     }
 }
 
-function drawOval(x, y, radius){
+/**
+ * Draw a circle
+ * @param {*} x 
+ * @param {*} y 
+ * @param {*} radius 
+ */
+function drawCircle(x, y, radius){
 
     context.beginPath();
     context.arc(x, y, radius, 0, 2 * Math.PI, false);
@@ -177,6 +204,12 @@ function drawOval(x, y, radius){
     context.stroke();
 }
 
+/**
+ * Linear interpolation
+ * @param {*} v0 origin
+ * @param {*} v1 target
+ * @param {*} t step 
+ */
 function lerp(v0, v1, t) {
     return v0 + t * (v1 - v0);
   }
