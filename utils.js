@@ -61,7 +61,7 @@ function getPixelRGB(x, y){
 }
 
 /**
- * Euclidean distance no sqrt
+ * Euclidean distance RGB no sqrt
  * @param {*} r1 
  * @param {*} g1 
  * @param {*} b1 
@@ -75,19 +75,43 @@ function rgbDistance(r1, g1, b1, r2, g2, b2) {
 }
 
 /**
+ * Euclidean distance x, y no sqrt
+ * @param {*} x0 
+ * @param {*} y0 
+ * @param {*} x1 
+ * @param {*} y1 
+ */
+function distance(x0, y0, x1, y1){
+
+    return Math.pow((x1 - x0), 2) + Math.pow((y1 - y0), 2);
+}
+
+/**
  * Draw a circle
  * @param {*} x 
  * @param {*} y 
  * @param {*} radius 
  */
-function drawCircle(x, y, radius){
+function drawCircle(x, y, radius, fill){
 
     context.beginPath();
     context.arc(x, y, radius, 0, 2 * Math.PI, false);
-    context.fillStyle = 'gray';
-    context.fill();
+    if(fill){
+        context.fillStyle = 'gray';
+        context.fill();
+    }
     context.lineWidth = 5;
     context.strokeStyle = 'green';
+    context.stroke();
+}
+
+function drawLine(x0, y0, x1, y1){
+
+    context.beginPath();
+    context.moveTo(x0, y0);
+    context.lineTo(x1, y1);
+    context.lineWidth = 2;
+    context.strokeStyle = 'blue';
     context.stroke();
 }
 
@@ -109,4 +133,24 @@ function lerp(v0, v1, t) {
  */
 function lerpPrecise(v0, v1, t) {
     return (1 - t) * v0 + t * v1;
+}
+
+function min(x0, x1){
+
+    if(x1 <= x0){
+
+        return x1;
+    }
+
+    return x0;
+}
+
+function max(x0, x1){
+
+    if(x0 <= x1){
+        
+        return x1;
+    }
+
+    return x0;
 }

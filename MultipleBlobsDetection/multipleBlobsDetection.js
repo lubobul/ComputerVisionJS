@@ -17,11 +17,57 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     });
 }
 
+var blobs = [];
+
+class Blob {
+
+    constructor(x, y){
+        this.minx = x;
+        this.miny = y;
+        this.maxx = x;
+        this.maxy = y;
+    }
+
+    add(x, y){
+
+        this.minx = min(this.minx, x);
+        this.miny = min(this.miny, y);
+        this.maxx = max(this.maxx, x);
+        this.maxy = max(this.maxy, y);
+    }
+
+    isNear(x, y){
+
+        let cx = (this.minx + this.maxx) / 2;
+        let cy = (this.miny + this.maxy) / 2;
+
+        let d = distance(this.x(), this.y(), x, y);
+        
+        return d < Math.pow(distanceFromBlobThreshold, 2);
+    }
+
+    x(){
+
+        return (this.minx + this.maxx) / 2;
+    }
+
+    y(){
+
+        return (this.miny + this.maxy) / 2;
+    }
+
+    getSize(){
+
+        return this.x() * this.y();
+    }
+}
+
 //Declare some global vars
-var width = 1280;
-var height = 960;
+var width = 960;
+var height = 720;
 var blobColorThreshold = 30; //0-255
-var timesTrackedThreshold = 1; //amount of pixels found
+var blobSizeThreshold = 300; //amount of pixels found per blob
+var distanceFromBlobThreshold = 100;
 
 var trackColor = {
     r : 255,
@@ -29,12 +75,12 @@ var trackColor = {
     b : 255
 }
 
-var avarageBlobPosition_x = 0;
-var avarageBlobPosition_y = 0;
 var lerpX = 0;
 var lerpY = 0;
 var lerpVelocity = 5;
 var timesTracked = 0;
+
+var connectedMode = true;
 
 /**
  * The update function is called once everytime the browser renders -> 60 fps cap
@@ -48,26 +94,33 @@ function update() {
     context.restore();
 
     //acquire bitmap
-    var imageData = context.getImageData(0, 0, width, height);
-    var pixels = imageData.data;
+    let imageData = context.getImageData(0, 0, width, height);
+    let pixels = imageData.data;
 
     traverseBitmap(pixels);
 
-    // Draw the ImageData at the given (x,y) coordinates.
     context.putImageData(imageData, 0, 0);
 
-    if(timesTracked > timesTrackedThreshold){
+    for(let i = 0; i< blobs.length; i++){
 
-        //Linear interpolation step = deltaTime(coming from animationEngine) * lerpVelocity
-        lerpX = lerp(lerpX, avarageBlobPosition_x, this.deltaTime * lerpVelocity);
-        lerpY = lerp(lerpY, avarageBlobPosition_y, this.deltaTime * lerpVelocity);
+        let blob0 = blobs[i];
+        let blob1 = blobs[i + 1];
+        
+        if(blob0.getSize() > blobSizeThreshold){
 
-        drawCircle(lerpX, lerpY, 40, true);
+            drawCircle(blob0.x(), blob0.y(), 25, false);
+
+            //connect blobs with lines
+            if(connectedMode && blob1){
+                
+                drawLine(blob0.x(), blob0.y(), blob1.x(), blob1.y());
+            }
+        }
+        
     }
 
-    timesTracked = 0;
-    avarageBlobPosition_x = 0;
-    avarageBlobPosition_y = 0;
+    //reset blobs
+    blobs = [];
 }
 
 /**
@@ -91,10 +144,20 @@ function traverseBitmap(pixels) {
                 
             //check if tracked color is within the Threshold 
             if (colorDistance < Math.pow(blobColorThreshold, 2)) {
-                
-                avarageBlobPosition_x += x;
-                avarageBlobPosition_y += y;
-                timesTracked++;
+
+                var foundBlob = blobs.find(function(blob){
+ 
+                    return blob.isNear(x, y);
+                });
+
+                if(foundBlob){
+                    foundBlob.add(x, y);
+                }
+                else {
+                    let newBlob = new Blob(x, y);
+
+                    blobs.push(newBlob);
+                }
                 
                 //set tracked color to white (easier to see what's happening)
                 pixels[pixIndex    ] = 255; // red
@@ -103,8 +166,4 @@ function traverseBitmap(pixels) {
             }
         }
     }
-
-    //find avarage for blob x and y, devide by 4 because of bitmap size
-    avarageBlobPosition_x = (avarageBlobPosition_x) /timesTracked;
-    avarageBlobPosition_y = (avarageBlobPosition_y) /timesTracked;
 }
