@@ -2,7 +2,7 @@
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
 
-//Get Canvas Coordinates on click
+//Subscribe mouse down on the canvas
 canvas.addEventListener("mousedown", mouseDown, false);
 
 function mouseDown(e)
@@ -19,6 +19,10 @@ function mouseDown(e)
     }
 }
 
+/**
+ * Returns mouse coordinates on canvas in {x, y} format
+ * @param {*} e 
+ */
 function getMouseCoordinates(e)
 {
     var x;
@@ -105,6 +109,13 @@ function drawCircle(x, y, radius, fill){
     context.stroke();
 }
 
+/**
+ * Draw a lin from x0, y0 to x1, y1
+ * @param {*} x0 
+ * @param {*} y0 
+ * @param {*} x1 
+ * @param {*} y1 
+ */
 function drawLine(x0, y0, x1, y1){
 
     context.beginPath();
@@ -135,6 +146,11 @@ function lerpPrecise(v0, v1, t) {
     return (1 - t) * v0 + t * v1;
 }
 
+/**
+ * Returns the smaller value
+ * @param {*} x0 
+ * @param {*} x1 
+ */
 function min(x0, x1){
 
     if(x1 <= x0){
@@ -145,6 +161,11 @@ function min(x0, x1){
     return x0;
 }
 
+/**
+ * Returns the bigger value
+ * @param {*} x0 
+ * @param {*} x1 
+ */
 function max(x0, x1){
 
     if(x0 <= x1){
