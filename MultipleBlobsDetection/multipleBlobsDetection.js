@@ -67,7 +67,7 @@ var width = 960;
 var height = 720;
 var blobColorThreshold = 30; //0-255
 var blobSizeThreshold = 300; //amount of pixels found per blob
-var distanceFromBlobThreshold = 100;
+var distanceFromBlobThreshold = 150;
 
 var trackColor = {
     r : 255,
@@ -81,17 +81,14 @@ var lerpVelocity = 5;
 var timesTracked = 0;
 
 var connectedMode = true;
+var maxBlobs = 50;
 
 /**
  * The update function is called once everytime the browser renders -> 60 fps cap
  */
 function update() {
 
-    //invert on X axis, we want to have a mirror
-    context.save();
-    context.scale(-1, 1);
-    context.drawImage(video, 0, 0, -width, height);
-    context.restore();
+    context.drawImage(video, 0, 0, width, height);
 
     //acquire bitmap
     let imageData = context.getImageData(0, 0, width, height);
@@ -153,7 +150,7 @@ function traverseBitmap(pixels) {
                 if(foundBlob){
                     foundBlob.add(x, y);
                 }
-                else {
+                else if(blobs.length < maxBlobs){
                     let newBlob = new Blob(x, y);
 
                     blobs.push(newBlob);

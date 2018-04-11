@@ -41,11 +41,7 @@ var timesTracked = 0;
  */
 function update() {
 
-    //invert on X axis, we want to have a mirror
-    context.save();
-    context.scale(-1, 1);
-    context.drawImage(video, 0, 0, -width, height);
-    context.restore();
+    context.drawImage(video, 0, 0, width, height);
 
     //acquire bitmap
     var imageData = context.getImageData(0, 0, width, height);

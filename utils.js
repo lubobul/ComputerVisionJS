@@ -7,12 +7,11 @@ canvas.addEventListener("mousedown", mouseDown, false);
 
 function mouseDown(e)
 {
-    if (e.button === 2)
-    { //right click 
+    //right click
+    if (e.button === 2){  
      
     }
-    else
-    {
+    else{
         let coordinates = getMouseCoordinates(e);
 
         trackColor = getPixelRGB(coordinates.x, coordinates.y);
@@ -23,24 +22,26 @@ function mouseDown(e)
  * Returns mouse coordinates on canvas in {x, y} format
  * @param {*} e 
  */
-function getMouseCoordinates(e)
-{
+function getMouseCoordinates(e){
+
     var x;
     var y;
 
-    if (e.pageX || e.pageY)
-    {
+    if (e.pageX || e.pageY){
+
         x = e.pageX;
         y = e.pageY;
-    }
-    else
-    {
+    }else{
+
         x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
         y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
     }
 
     x -= canvas.offsetLeft;
     y -= canvas.offsetTop;
+
+    //invert x axis (canvas is inverted by css : transform: scaleX(-1))
+    x = canvas.width - x;
 
     return {x, y}
 }
@@ -134,7 +135,7 @@ function drawLine(x0, y0, x1, y1){
  */
 function lerp(v0, v1, t) {
     return v0 + t * (v1 - v0);
-  }
+}
 
 /**
  * Linear interpolation, precise method, which guarantees v = v1 when t = 1.
