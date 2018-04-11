@@ -10,11 +10,19 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     // audio: false - since we only want video
     navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function (stream) {
 
+        setLeftClickCallback(onLeftClick);
+
         video.srcObject = stream;
 
         //promise of getting stream of camera is resolved, start the animation engine
         animationEngine.start();
+
     });
+}
+
+function onLeftClick(){
+
+    trackColor = getPixelRGB(this.coordinates.x, this.coordinates.y);
 }
 
 var blobs = [];
@@ -38,10 +46,11 @@ class Blob {
 
     isNear(x, y){
 
-        let cx = (this.minx + this.maxx) / 2;
-        let cy = (this.miny + this.maxy) / 2;
+        //clamp 
+        let clampedx = max(min(x, this.maxx), this.minx)
+        let clampedy = max(min(y, this.maxy), this.miny);
 
-        let d = distance(this.x(), this.y(), x, y);
+        let d = distance(clampedx, clampedy, x, y);
         
         return d < Math.pow(distanceFromBlobThreshold, 2);
     }
@@ -58,7 +67,17 @@ class Blob {
 
     getSize(){
 
-        return this.x() * this.y();
+        return (this.maxx - this.minx) * (this.maxy - this.miny);
+    }
+
+    showWithStaticSize(){
+        
+        drawCircle(this.x(), this.y(), 25, false);
+    }
+
+    showWithDynamicSize(){
+
+        drawCircle(this.x(), this.y(), Math.sqrt(this.getSize())/2 , false);
     }
 }
 
@@ -67,7 +86,7 @@ var width = 960;
 var height = 720;
 var blobColorThreshold = 30; //0-255
 var blobSizeThreshold = 300; //amount of pixels found per blob
-var distanceFromBlobThreshold = 150;
+var distanceFromBlobThreshold = 50;
 
 var trackColor = {
     r : 255,
@@ -81,7 +100,7 @@ var lerpVelocity = 5;
 var timesTracked = 0;
 
 var connectedMode = true;
-var maxBlobs = 50;
+var maxBlobs = 10;
 
 /**
  * The update function is called once everytime the browser renders -> 60 fps cap
@@ -105,7 +124,7 @@ function update() {
         
         if(blob0.getSize() > blobSizeThreshold){
 
-            drawCircle(blob0.x(), blob0.y(), 25, false);
+            blob0.showWithDynamicSize();
 
             //connect blobs with lines
             if(connectedMode && blob1){

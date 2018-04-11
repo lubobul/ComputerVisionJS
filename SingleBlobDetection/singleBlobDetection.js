@@ -9,12 +9,18 @@ animationEngine.setAnimationFrameCallback(update);
 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     // audio: false - since we only want video
     navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function (stream) {
-
+        
+        setLeftClickCallback(onLeftClick);
         video.srcObject = stream;
 
         //promise of getting stream of camera is resolved, start the animation engine
         animationEngine.start();
     });
+}
+
+function onLeftClick(){
+
+    trackColor = getPixelRGB(this.coordinates.x, this.coordinates.y);
 }
 
 //Declare some global vars

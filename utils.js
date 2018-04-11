@@ -5,6 +5,8 @@ var context = canvas.getContext('2d');
 //Subscribe mouse down on the canvas
 canvas.addEventListener("mousedown", mouseDown, false);
 
+
+
 function mouseDown(e)
 {
     //right click
@@ -12,10 +14,21 @@ function mouseDown(e)
      
     }
     else{
-        let coordinates = getMouseCoordinates(e);
+        this.coordinates = getMouseCoordinates(e);
 
-        trackColor = getPixelRGB(coordinates.x, coordinates.y);
+
+        if(onLeftClickCallback){
+
+            onLeftClickCallback.call(this);
+        }
     }
+}
+
+var onLeftClickCallback = null;
+
+function setLeftClickCallback(callback){
+
+   onLeftClickCallback = callback;
 }
 
 /**
@@ -107,6 +120,14 @@ function drawCircle(x, y, radius, fill){
     }
     context.lineWidth = 5;
     context.strokeStyle = 'green';
+    context.stroke();
+}
+
+
+function drawRect(x, y, width, height){
+
+    context.strokeStyle = 'blue';
+    context.rect(x, y, width, height);
     context.stroke();
 }
 
