@@ -111,22 +111,23 @@ function distance(x0, y0, x1, y1){
  * @param {*} radius 
  */
 function drawCircle(x, y, radius, fill){
+    context.fillStyle = 'gray';
+    context.lineWidth = 5;
+    context.strokeStyle = 'green';
 
     context.beginPath();
     context.arc(x, y, radius, 0, 2 * Math.PI, false);
     if(fill){
-        context.fillStyle = 'gray';
         context.fill();
     }
-    context.lineWidth = 5;
-    context.strokeStyle = 'green';
+
     context.stroke();
 }
 
 
 function drawRect(x, y, width, height){
 
-    context.strokeStyle = 'blue';
+    context.strokeStyle = 'green';
     context.rect(x, y, width, height);
     context.stroke();
 }
@@ -140,11 +141,11 @@ function drawRect(x, y, width, height){
  */
 function drawLine(x0, y0, x1, y1){
 
+    context.lineWidth = 2;
+    context.strokeStyle = 'blue';
     context.beginPath();
     context.moveTo(x0, y0);
     context.lineTo(x1, y1);
-    context.lineWidth = 2;
-    context.strokeStyle = 'blue';
     context.stroke();
 }
 

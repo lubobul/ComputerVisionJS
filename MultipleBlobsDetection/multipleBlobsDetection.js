@@ -76,8 +76,15 @@ class Blob {
     }
 
     showWithDynamicSize(){
+        
+        let radius = max(25, min(Math.sqrt(this.getSize())/2, 500));
+        
+        drawCircle(this.x(), this.y(), radius, false);
+    }
 
-        drawCircle(this.x(), this.y(), Math.sqrt(this.getSize())/2 , false);
+    showWithDynamicSizeRectangle(){
+
+        drawRect(this.minx, this.miny, this.maxx - this.minx, this.maxy - this.miny);
     }
 }
 
@@ -86,7 +93,7 @@ var width = 960;
 var height = 720;
 var blobColorThreshold = 30; //0-255
 var blobSizeThreshold = 300; //amount of pixels found per blob
-var distanceFromBlobThreshold = 50;
+var distanceFromBlobThreshold = 100;
 
 var trackColor = {
     r : 255,
@@ -127,7 +134,7 @@ function update() {
             blob0.showWithDynamicSize();
 
             //connect blobs with lines
-            if(connectedMode && blob1){
+            if(connectedMode && blob1 && blob1.getSize() > blobSizeThreshold){
                 
                 drawLine(blob0.x(), blob0.y(), blob1.x(), blob1.y());
             }
@@ -170,6 +177,7 @@ function traverseBitmap(pixels) {
                     foundBlob.add(x, y);
                 }
                 else if(blobs.length < maxBlobs){
+                    
                     let newBlob = new Blob(x, y);
 
                     blobs.push(newBlob);
