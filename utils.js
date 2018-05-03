@@ -126,8 +126,9 @@ function drawCircle(x, y, radius, fill){
 
 
 function drawRect(x, y, width, height){
-
+    context.lineWidth = 5;
     context.strokeStyle = 'green';
+    context.beginPath();
     context.rect(x, y, width, height);
     context.stroke();
 }

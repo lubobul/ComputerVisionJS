@@ -45,7 +45,7 @@ class Blob {
     }
 
     isNear(x, y){
-
+        
         //clamp 
         let clampedx = max(min(x, this.maxx), this.minx)
         let clampedy = max(min(y, this.maxy), this.miny);
@@ -77,7 +77,7 @@ class Blob {
 
     showWithDynamicSize(){
         
-        let radius = max(25, min(Math.sqrt(this.getSize())/2, 500));
+        let radius = max(20, min(Math.sqrt(this.getSize())/2, 500));
         
         drawCircle(this.x(), this.y(), radius, false);
     }
@@ -91,7 +91,7 @@ class Blob {
 //Declare some global vars
 var width = 960;
 var height = 720;
-var blobColorThreshold = 30; //0-255
+var blobColorThreshold = Math.pow(30, 2); //0-255
 var blobSizeThreshold = 300; //amount of pixels found per blob
 var distanceFromBlobThreshold = 100;
 
@@ -131,7 +131,7 @@ function update() {
         
         if(blob0.getSize() > blobSizeThreshold){
 
-            blob0.showWithDynamicSize();
+            blob0.showWithDynamicSizeRectangle();
 
             //connect blobs with lines
             if(connectedMode && blob1 && blob1.getSize() > blobSizeThreshold){
@@ -166,7 +166,7 @@ function traverseBitmap(pixels) {
                 trackColor.b);
                 
             //check if tracked color is within the Threshold 
-            if (colorDistance < Math.pow(blobColorThreshold, 2)) {
+            if (colorDistance < blobColorThreshold) {
 
                 var foundBlob = blobs.find(function(blob){
  
