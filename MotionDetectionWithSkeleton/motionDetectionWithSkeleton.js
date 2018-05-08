@@ -17,9 +17,23 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     });
 }
 
+var trackColor = {
+    r : 100,
+    g : 255,
+    b : 0
+}
+
+var connectedMode = true;
+var maxBlobs = 10;
+
+var blobSizeThreshold = 300; //amount of pixels found per blob
+var distanceFromBlobThreshold = 50;
+
+var blobs = [];
+
 //Declare some global vars
-var width = 1280;
-var height = 960;
+var width = 960;
+var height = 720;
 var motionColorThreshold = Math.pow(100, 2); //0-255
 var oldImageData = null;
 
@@ -42,8 +56,28 @@ function update() {
 
     oldImageData = context.getImageData(0, 0, width, height);
 
-     // Draw the ImageData at the given (x,y) coordinates.
-     context.putImageData(imageData, 0, 0);
+    // Draw the ImageData at the given (x,y) coordinates.
+    context.putImageData(imageData, 0, 0);
+
+     for(let i = 0; i< blobs.length; i++){
+
+        let blob0 = blobs[i];
+        let blob1 = blobs[i + 1];
+        
+        if(blob0.getSize() > blobSizeThreshold){
+
+            blob0.showWithDynamicSizeRectangle();
+
+            //connect blobs with lines
+            if(connectedMode && blob1 && blob1.getSize() > blobSizeThreshold){
+                
+                drawLine(blob0.x(), blob0.y(), blob1.x(), blob1.y());
+            }
+        }
+    }
+     
+    //reset blobs
+    blobs = [];
 }
 
 /**
@@ -70,15 +104,30 @@ function traverseBitmap(pixels, oldPixels) {
             if (colorDistance < motionColorThreshold) {
                     
                 //set tracked color to white (easier to see what's happening)
-                pixels[pixIndex    ] = 255; // red
-                pixels[pixIndex + 1] = 255; // green
-                pixels[pixIndex + 2] = 255; // blue
-            }else{
-
-                //set tracked color to white (easier to see what's happening)
                 pixels[pixIndex    ] = 0; // red
                 pixels[pixIndex + 1] = 0; // green
                 pixels[pixIndex + 2] = 0; // blue
+            }else{
+
+                var foundBlob = blobs.find(function(blob){
+ 
+                    return blob.isNear(x, y);
+                });
+
+                if(foundBlob){
+                    foundBlob.add(x, y);
+                }
+                else if(blobs.length < maxBlobs){
+                    
+                    let newBlob = new Blob(x, y);
+
+                    blobs.push(newBlob);
+                }
+
+                //set tracked color to white (easier to see what's happening)
+                pixels[pixIndex    ] = trackColor.r; // red
+                pixels[pixIndex + 1] = trackColor.g; // green
+                pixels[pixIndex + 2] = trackColor.b; // blue
             }
         }
     }

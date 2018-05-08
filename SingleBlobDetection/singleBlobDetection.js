@@ -26,7 +26,7 @@ function onLeftClick(){
 //Declare some global vars
 var width = 1280;
 var height = 960;
-var blobColorThreshold = 30; //0-255
+var blobColorThreshold = Math.pow(30, 2); //0-255
 var timesTrackedThreshold = 1; //amount of pixels found
 
 var trackColor = {
@@ -92,7 +92,7 @@ function traverseBitmap(pixels) {
                 trackColor.b);
                 
             //check if tracked color is within the Threshold 
-            if (colorDistance < Math.pow(blobColorThreshold, 2)) {
+            if (colorDistance < blobColorThreshold) {
                 
                 avarageBlobPosition_x += x;
                 avarageBlobPosition_y += y;
